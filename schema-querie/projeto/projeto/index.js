@@ -1,19 +1,52 @@
 const {ApolloServer, gql}  = require('apollo-server')
 
+const usuarios = [
+{
+   id:1,
+   nome: "joda silva",
+   email: "joao@gmail.com",
+   idade: 29
+},
+{
+   id:2,
+   nome: "tereza cristina",
+   email: "terezacristina@gmail.com",
+   idade: 49
+},
+{
+   id:3,
+   nome: "alan bida",
+   email: "alan@gmail.com",
+   idade: 19
+},
+]
+
+const perfis = [
+   {id:1, nome: "comun"},
+   {id: 2, nome:"administrador"}
+]
+
+
+
 const typeDefs = gql`
    scalar Date
 
 
    #tpo personalizado 
-
+   
    type User {
       id: ID
       nome: String! 
-      email: String!
+      email: String! 
       idade: Int
       salario: Float
       vip: Boolean
    }
+   type Perfil{
+      id: Int
+      nome: String
+   }
+
 
    type Produto{
       nome: String!
@@ -29,9 +62,12 @@ const typeDefs = gql`
     horaCerta: Date
     usuarioLogado: User
     produtoEmDestaque: Produto
-
+    numerosMegaSena: [Int]!
+    usuarios: [User]
+    usuarioByID(id: ID): User
+    perfis: [Perfil]
+    perfisByID(id: Int): Perfil
    }
-
 `
 
 const resolvers = {
@@ -60,7 +96,7 @@ const resolvers = {
    },
 
 
-
+ // aqui vai a busca 
    Query: {
       ola(){
         return `aqui estou retornando a query ola`
@@ -88,7 +124,29 @@ const resolvers = {
             preco: 44.90,
             
          }
+      },
+      numerosMegaSena(){
+         // return [4,5,6,6,45,4]
+         const crescente = (a,b) => a - b
+         return Array(6).fill(0).map(n=> parseInt(Math.random() * 60 + 1)).sort(crescente)
+      },
+      usuarios(){
+         return usuarios
+      },
+      usuarioByID(_, args){
+         const selecionados = usuarios.filter(user => user.id == args.id)
+         return selecionados ? selecionados[0] : null
+      },
+
+      perfis(){
+         return  perfis
+      },
+      perfisByID(_, {id}){
+         const selecionados = perfis.filter(perfil => perfil.id == id)
+         return selecionados ? selecionados[0] : null
       }
+
+
    }
 
 }
